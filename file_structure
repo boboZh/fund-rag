@@ -1,0 +1,27 @@
+fund_agent_backend/
+├── .venv/                  # 等价于 node_modules
+├── .env                    # 等价于 .env
+├── requirements.txt        # 等价于 package.json 的 dependencies 部分
+├── .gitignore              # 别忘了把 .venv 和 .env 加进去
+│
+├── main.py                 # 等价于 index.js / main.ts (系统入口，只负责初始化 app 和挂载路由)
+│
+└── app/                    # 等价于 src/ (所有核心代码都在这里)
+    ├── __init__.py         # 空文件。告诉 Python 这是一个包 (现代 Python 可省，但建议留着防坑)
+    │
+    ├── api/                # 等价于 routes/ 或 controllers/
+    │   └── chat.py         # 存放 @app.post("/api/chat") 这些路由定义
+    │
+    ├── core/               # 等价于 config/
+    │   └── config.py       # 集中读取 .env 变量的地方，不要在业务代码里到处 os.getenv
+    │
+    ├── schemas/            # 等价于 types/ 或 dto/ (极其重要)
+    │   └── chat_dto.py     # 存放 Pydantic 模型，比如你写的 SearchQuery，用于入参出参校验
+    │
+    ├── models/             # (如果有数据库) 存放 SQLAlchemy 等 ORM 模型
+    │
+    ├── services/           # 等价于 services/
+    │   ├── llm_service.py  # 把调用 DeepSeek 的逻辑抽离到这里
+    │   └── rag_service.py  # 向量检索逻辑
+    │
+    └── utils/              # 等价于 utils/ (放一些时间格式化、纯工具函数)
