@@ -101,14 +101,14 @@ def test_replace_chunks_reads_split_paragraphs_keys(monkeypatch):
         1,
         [
             {
-                "chunkIndex": 0,
-                "chunkType": "text",
-                "pageStart": 1,
-                "pageEnd": 1,
+                "chunk_index": 0,
+                "chunk_type": "text",
+                "page_start": 1,
+                "page_end": 1,
                 "heading": "估值",
-                "paragraphCount": 1,
+                "paragraph_count": 1,
                 "content": "目标价上调到25元。",
-                "charCount": 10,
+                "char_count": 10,
             }
         ],
     )

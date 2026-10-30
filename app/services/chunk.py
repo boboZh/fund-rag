@@ -1,7 +1,7 @@
 import math
 import re
-from app.utils.cache import writeCache
-from app.mock.doc import withoutToc
+# from app.utils.cache import write_cache
+# from app.mock.doc import withoutToc
 
 
 # 拼接纯文本内容
@@ -49,17 +49,17 @@ def pack_long_text(paragraph, max_chars):
 
 
 # 整合切块信息
-def to_chunk(items, type, chunkIndex):
+def to_chunk(items, type, chunk_index):
     content = content_of(items, type)
     return {
-        "chunkIndex": chunkIndex,
-        "chunkType": type,
-        "pageStart": items[0]["page"],
-        "pageEnd": items[len(items) - 1]["page"],
+        "chunk_index": chunk_index,
+        "chunk_type": type,
+        "page_start": items[0]["page"],
+        "page_end": items[len(items) - 1]["page"],
         "heading": items[0]["heading"] or None,
-        "paragraphCount": len(items),
+        "paragraph_count": len(items),
         "content": content,
-        "charCount": len(content),
+        "char_count": len(content),
     }
 
 
@@ -114,11 +114,11 @@ def split_paragraphs(paragraphs, config=None):
             emit([paragraph], type)
             return
 
-        headingChanged = len(buffer) > 0 and (buffer[0]["heading"] or None) != (
+        heading_changed = len(buffer) > 0 and (buffer[0]["heading"] or None) != (
             paragraph["heading"] or None
         )
-        typeChanged = len(buffer) > 0 and buffer_type != type
-        if headingChanged or typeChanged:
+        type_changed = len(buffer) > 0 and buffer_type != type
+        if heading_changed or type_changed:
             flush(None)
 
         pieces = pack_long_text(paragraph, max_chars)
@@ -134,7 +134,7 @@ def split_paragraphs(paragraphs, config=None):
                 continue
 
             last = buffer[len(buffer) - 1]
-            canOverlap = (
+            can_overlap = (
                 overlap_paragraphs == 1
                 and type == "text"
                 and len(last["text"]) < max_chars
@@ -142,7 +142,7 @@ def split_paragraphs(paragraphs, config=None):
                 and (last["heading"] or None) == (piece["heading"] or None)
             )
             emit(buffer, type)
-            buffer = [last, piece] if canOverlap else [piece]
+            buffer = [last, piece] if can_overlap else [piece]
             buffer_type = type
 
     for paragraph in paragraphs:
@@ -151,11 +151,11 @@ def split_paragraphs(paragraphs, config=None):
     if len(buffer):
         emit(buffer, buffer_type)
 
-    return [{**chunk, "chunkIndex": index} for index, chunk in enumerate(chunks)]
+    return [{**chunk, "chunk_index": index} for index, chunk in enumerate(chunks)]
 
 
 # result = split_paragraphs(
 #     withoutToc["paragraphs"], {"max_chars": 800, "overlap_paragraphs": 1}
 # )
 
-# writeCache("chunks-result", result)
+# write_cache("chunks-result", result)

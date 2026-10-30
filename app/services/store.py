@@ -187,14 +187,14 @@ def replace_chunks(doc_id, user_id, chunks):
             [
                 doc_id,
                 user_id,
-                chunk["chunkIndex"],
-                chunk["chunkType"],
-                chunk["pageStart"],
-                chunk["pageEnd"],
+                chunk["chunk_index"],
+                chunk["chunk_type"],
+                chunk["page_start"],
+                chunk["page_end"],
                 heading[:255] if heading else None,
-                chunk["paragraphCount"],
+                chunk["paragraph_count"],
                 chunk["content"],
-                chunk["charCount"],
+                chunk["char_count"],
             ]
         )
     exec_strict(

@@ -17,7 +17,7 @@ def test_short_paragraphs_stay_one_chunk():
     )
     assert len(chunks) == 1
     assert chunks[0]["content"] == "产能继续释放。\n需求保持旺盛。\n成本开始下行。"
-    assert chunks[0]["paragraphCount"] == 3
+    assert chunks[0]["paragraph_count"] == 3
 
 
 def test_new_heading_starts_new_chunk():
@@ -68,7 +68,7 @@ def test_table_and_summary_are_own_chunks():
         ],
         {"max_chars": 800, "overlap_paragraphs": 1},
     )
-    assert [chunk["chunkType"] for chunk in chunks] == ["summary", "table", "text"]
+    assert [chunk["chunk_type"] for chunk in chunks] == ["summary", "table", "text"]
     assert chunks[1]["content"] == "收入 10 20 30\n利润 1 2 3"
 
 
@@ -82,7 +82,7 @@ def test_table_stays_one_chunk_over_limit():
         ],
         {"max_chars": 50, "overlap_paragraphs": 1},
     )
-    assert chunks[0]["chunkType"] == "table"
+    assert chunks[0]["chunk_type"] == "table"
     assert len(chunks[0]["content"].split("\n")) == 3
     assert chunks[1]["content"] == "维持买入评级。"
     assert not chunks[1]["content"].startswith(row)
