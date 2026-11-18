@@ -10,3 +10,7 @@ app.include_router(ingest_router)
 app.include_router(retrieve_router)
 
 
+@app.get("/healthz")
+def healthz():
+    """Process liveness; does not call databases or paid model APIs."""
+    return {"status": "ok"}

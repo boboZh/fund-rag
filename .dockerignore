@@ -1,0 +1,17 @@
+# Runtime secrets and local dependencies never enter the build context.
+.git
+.github
+.env
+.env.*
+*.pem
+*.key
+node_modules
+.venv
+__pycache__
+.pytest_cache
+*.pyc
+coverage
+*.log
+.DS_Store
+tests
+*.json
