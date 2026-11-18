@@ -10,7 +10,7 @@ from app.utils.cancel import throw_if_cancelled
 DEFAULT_TOP_K = 5
 MAX_TOP_K = 20
 
-MIN_SCORE_MIN = 0.06
+MIN_SCORE_MIN = 0.11
 MIN_SCORE_MAX = 0.7419
 DEFAULT_MIN_SCORE = MIN_SCORE_MIN
 
