@@ -4,6 +4,11 @@ on:
   push:
     tags: ['v*.*.*']
   workflow_dispatch:
+    inputs:
+      deploy:
+        description: '发布镜像后更新服务器（需先启用 DEPLOY_ENABLED）'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -16,6 +21,8 @@ concurrency:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.image.outputs.name }}@${{ steps.build.outputs.digest }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -57,3 +64,46 @@ jobs:
           IMAGE: ${{ steps.image.outputs.name }}
           DIGEST: ${{ steps.build.outputs.digest }}
         run: echo "Published image — $IMAGE@$DIGEST" >> "$GITHUB_STEP_SUMMARY"
+
+  deploy:
+    needs: publish
+    if: ${{ vars.DEPLOY_ENABLED == 'true' && (github.event_name == 'push' || inputs.deploy) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      contents: read
+    concurrency:
+      group: production-rag
+      cancel-in-progress: false
+    steps:
+      - name: Validate server configuration
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          SERVER_SSH_FINGERPRINT: ${{ secrets.SERVER_SSH_FINGERPRINT }}
+        shell: bash
+        run: |
+          for name in SERVER_IP SERVER_USER SERVER_SSH_KEY SERVER_SSH_FINGERPRINT; do
+            if [ -z "${!name}" ]; then
+              echo "Missing required secret: $name" >&2
+              exit 1
+            fi
+          done
+      - name: Deploy image and verify service
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          DEPLOY_SERVICE: rag
+          DEPLOY_IMAGE: ${{ needs.publish.outputs.image }}
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT || '22' }}
+          fingerprint: ${{ secrets.SERVER_SSH_FINGERPRINT }}
+          envs: DEPLOY_SERVICE,DEPLOY_IMAGE
+          command_timeout: 35m
+          script: |
+            set -eu
+            test -f /opt/fund/scripts/deploy.py
+            python3 /opt/fund/scripts/deploy.py "$DEPLOY_SERVICE" "$DEPLOY_IMAGE"

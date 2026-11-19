@@ -2,8 +2,9 @@
 
 ## 当前范围
 
-本次只补齐镜像构建、健康检查和 GHCR 发布。`cd.yml` 已替换旧部署逻辑：发布镜像后不会 SSH、SCP、重载 PM2 或切换线上入口。现有服务器服务继续运行。
-尚未包含生产 Compose、服务器部署脚本、自动回滚或数据搬迁，先不要删除旧服务和目录。
+已包含镜像构建、健康检查、GHCR 发布，以及可选的 SSH 自动部署。自动部署默认关闭：先安装并验证共享部署脚本，再配置仓库变量 `DEPLOY_ENABLED=true`。
+手动发布默认只推送镜像，勾选 deploy 后才更新服务器；启用开关后，版本 tag 发布会自动部署。
+服务器安装步骤、Secrets、发布记录和回退说明统一见 fund-backend 仓库的 `deploy/README.md`。旧目录等自动更新验收后再清理。
 
 ## 本地构建
 
@@ -33,7 +34,7 @@ docker build -t fund-rag:local .
 - Uvicorn 监听 `0.0.0.0:9001`，默认 2 workers；后续按内存和负载调整。
 - `--env-file`/Compose `env_file` 注入现有数据库、Qdrant、Embedding、Rerank 和 LLM 配置。
 - 必须配置 `DEEPSEEK_API_KEY`：现有 LLM 模块在导入时创建客户端。测试的占位 Key 仅存在 conftest.py 中，不会复制进运行镜像。
-- MySQL 和 Qdrant 地址必须从容器可达；保留现有 Qdrant 容器与命名卷，不新建空集合替代业务数据。
+- 当前生产使用主机网络，MySQL、Qdrant 分别使用 `127.0.0.1:3306`、`127.0.0.1:6333`；保留现有 Qdrant 容器与命名卷。
 - `/healthz` 是进程存活检查，不调用模型或数据库，不能代替检索和入库验收。
 - pytest.ini 通过 importlib 模式解决 api/、services/ 下同名测试模块冲突。LLM 测试使用模拟流，不消耗真实模型额度。
 
