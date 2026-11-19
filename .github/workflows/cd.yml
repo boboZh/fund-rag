@@ -92,18 +92,12 @@ jobs:
           done
       - name: Deploy image and verify service
         uses: appleboy/ssh-action@v1.2.0
-        env:
-          DEPLOY_SERVICE: rag
-          DEPLOY_IMAGE: ${{ needs.publish.outputs.image }}
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
+          passphrase: ${{ secrets.SERVER_SSH_PASSPHRASE }}
           port: ${{ secrets.SERVER_PORT || '22' }}
           fingerprint: ${{ secrets.SERVER_SSH_FINGERPRINT }}
-          envs: DEPLOY_SERVICE,DEPLOY_IMAGE
           command_timeout: 35m
-          script: |
-            set -eu
-            test -f /opt/fund/scripts/deploy.py
-            python3 /opt/fund/scripts/deploy.py "$DEPLOY_SERVICE" "$DEPLOY_IMAGE"
+          script: fund-deploy rag ${{ needs.publish.outputs.image }}

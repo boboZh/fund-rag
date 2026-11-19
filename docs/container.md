@@ -4,6 +4,7 @@
 
 已包含镜像构建、健康检查、GHCR 发布，以及可选的 SSH 自动部署。自动部署默认关闭：先安装并验证共享部署脚本，再配置仓库变量 `DEPLOY_ENABLED=true`。
 手动发布默认只推送镜像，勾选 deploy 后才更新服务器；启用开关后，版本 tag 发布会自动部署。
+SSH 使用专用部署密钥、受限的 `fund-deploy` 入口；密钥口令通过 `SERVER_SSH_PASSPHRASE` 提供。先安装 deploy-ssh.py 并验证新公钥限制，再运行更新后的工作流。
 服务器安装步骤、Secrets、发布记录和回退说明统一见 fund-backend 仓库的 `deploy/README.md`。旧目录等自动更新验收后再清理。
 
 ## 本地构建
